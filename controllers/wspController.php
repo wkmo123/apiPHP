@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../models/wsp.php";
 
 class WspController
 {
@@ -22,6 +23,7 @@ class WspController
         }
 
         $response = $this->apiWsp($number, $name, $cod);
+        $result = Wsp::guardarOTP($number, $cod);
 
         echo $response;
 

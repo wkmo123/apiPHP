@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../controllers/DepartamentoController.php';
 require_once __DIR__ . '/../controllers/municipioController.php';
 require_once __DIR__ . '/../controllers/usuarioController.php';
+require_once __DIR__ . '/../controllers/wspController.php';
+
 
 
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -16,13 +18,21 @@ if ($url == '/api/departamentos' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $controller = new MunicipioController();
     $controller->getByDepartamento($departamentos_id);
 
-} elseif ($url == '/api/usuarios' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+} elseif ($url == '/api/usuarios/registro' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $controller = new UsuarioController();
     $data = json_decode(file_get_contents('php://input'), true);
     $controller->insertarUsuario($data);
 
-} else {
+}elseif($url == '/api/usuarios/enviar-otp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $controller = new WspController();
+
+    $requestBody = file_get_contents('php://input');
+    $data = json_decode($requestBody, true);
+
+    $controller->sendMessage($data);
+}
+ else {
     header('HTTP/1.1 404 Not Found');
     echo json_encode(['status' => 'error', 'message' => 'Endpoint no encontrado']);
 }

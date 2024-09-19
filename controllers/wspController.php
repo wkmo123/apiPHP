@@ -29,6 +29,36 @@ class WspController
 
     }
 
+    public function validarOTP($request)
+    {
+        $numero = $request["numero"] ?? "";
+        $otp = $request["otp"] ?? "";
+
+
+        if ((empty($numero) || empty($otp))) {
+            echo json_encode([
+                "status" => "error",
+
+                "message" => "El numero de telefono y el OTP son obligatorios"
+            ]);
+            return;
+        }
+
+        $resultado = Wsp::validarOTP($numero, $otp);
+
+        if ($resultado > 0) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "OTP validado correctamente"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "OTP invalido o numero incorrecto"
+            ]);
+        }
+    }
+
     private function apiWsp($numberuser, $name, $cod)
     {
         $number = "57" . $numberuser;

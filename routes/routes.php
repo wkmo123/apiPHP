@@ -5,34 +5,34 @@ require_once __DIR__ . '/../controllers/municipioController.php';
 require_once __DIR__ . '/../controllers/usuarioController.php';
 require_once __DIR__ . '/../controllers/wspController.php';
 
-
-
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$method = $_SERVER['REQUEST_METHOD'];
 
-if ($url == '/api/departamentos' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+// Mapeo de rutas: URL => [Método, Controlador, Función]
+$routes = [
+    '/api/departamentos' => ['GET', 'DepartamentoController', 'index'],
+    '/api/usuarios/registro' => ['POST', 'UsuarioController', 'insertarUsuario'],
+    '/api/usuarios/enviar-otp' => ['POST', 'WspController', 'sendMessage'],
+    '/api/usuarios/verificar-otp' => ['POST', 'WspController', 'validarOTP'],
+];
 
-    $controller = new DepartamentoController();
-    $controller->index();
-} elseif (preg_match('/\/api\/ciudades\/(\d+)/', $url, $matches) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    $departamentos_id = $matches[1];
+if (preg_match('/\/api\/ciudades\/(\d+)/', $url, $matches) && $method === 'GET') {
+    $departamento_id = $matches[1];
     $controller = new MunicipioController();
-    $controller->getByDepartamento($departamentos_id);
+    $controller->getByDepartamento($departamento_id);
+} else {
+    if (array_key_exists($url, $routes) && $routes[$url][0] === $method) {
+        // Obtener detalles de la ruta
+        $controllerName = $routes[$url][1];
+        $function = $routes[$url][2];
 
-} elseif ($url == '/api/usuarios/registro' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller = new $controllerName();
 
-    $controller = new UsuarioController();
-    $data = json_decode(file_get_contents('php://input'), true);
-    $controller->insertarUsuario($data);
+        $data = $method === 'POST' ? json_decode(file_get_contents('php://input'), true) : [];
 
-}elseif($url == '/api/usuarios/enviar-otp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $controller = new WspController();
-
-    $requestBody = file_get_contents('php://input');
-    $data = json_decode($requestBody, true);
-
-    $controller->sendMessage($data);
-}
- else {
-    header('HTTP/1.1 404 Not Found');
-    echo json_encode(['status' => 'error', 'message' => 'Endpoint no encontrado']);
+        $controller->$function($data);
+    } else {
+        header('HTTP/1.1 404 Not Found');
+        echo json_encode(['status' => 'error', 'message' => 'Endpoint no encontrado']);
+    }
 }

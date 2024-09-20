@@ -28,13 +28,14 @@ class UsuarioController
         }
 
         // Intentar insertar el nuevo usuario en la base de datos
-        $result = Usuario::save($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
+        $result = Usuario::saveRedis($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
 
         // Verificar si la inserción fue exitosa
-        if ($result > 0) {
+        if ($result) {
             echo json_encode([
                 "status" => "success",
-                "message" => "Usuario registrado correctamente."
+                "message" => "Usuario registrado correctamente.",
+                "userId" => $result
             ]);
         } else {
             echo json_encode([

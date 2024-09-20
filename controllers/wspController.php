@@ -63,9 +63,37 @@ class WspController
                         "status" => "success",
                         "message" => "OTP validado correctamente",
                         "user" => $userData
-
-
                     ]);
+                    $name = $userData['name'] ?? '';
+                    $lastname = $userData['lastname'] ?? '';
+                    $email = $userData['email'] ?? '';
+                    $cedula = $userData['cedula'] ?? '';
+                    $password = $userData['password'] ?? '';
+                    $telefono = $userData['telefono'] ?? '';
+                    $direccion = $userData['direccion'] ?? '';
+                    $user_type = $userData['user_type'] ?? 'user';
+                    $id_estado = $userData['id_estado'] ?? 1;
+                    $confCorreo = $userData['confCorreo'] ?? 0;
+                    $municipio_id = $userData['municipio_id'] ?? null;
+
+                    $result = Usuario::save(
+                        $name,
+                        $lastname,
+                        $email,
+                        $cedula,
+                        $password,
+                        $telefono,
+                        $direccion,
+                        $user_type,
+                        $id_estado,
+                        $confCorreo,
+                        $municipio_id
+                    );
+                    if ($result) {
+                        error_log("Usuario registrado en Redis correctamente con ID: " . $result);
+                    } else {
+                        error_log("Error al registrar el usuario en Redis.");
+                    }
                 } else {
                     echo json_encode([
                         "status" => "error",
@@ -95,20 +123,20 @@ class WspController
             "to" => $number,
             "type" => "template",
             "template" => array(
-                    "name" => "codverification",
-                    "language" => array(
-                            "code" => "es"
-                        ),
-                    "components" => array(
-                        array(
-                            "type" => "body",
-                            "parameters" => array(
-                                    array("type" => "text", "text" => "*" . $name . "*"),
-                                    array("type" => "text", "text" => "*" . $cod . "*")
-                                )
+                "name" => "codverification",
+                "language" => array(
+                    "code" => "es"
+                ),
+                "components" => array(
+                    array(
+                        "type" => "body",
+                        "parameters" => array(
+                            array("type" => "text", "text" => "*" . $name . "*"),
+                            array("type" => "text", "text" => "*" . $cod . "*")
                         )
                     )
                 )
+            )
         );
         $url = "https://graph.facebook.com/v15.0/105386462411555/messages";
         return $this->bodyrequestAPI($post, $url);
@@ -119,7 +147,7 @@ class WspController
         header('Content-Type: application/json');
         $ch = curl_init($url);
         $post = json_encode($postaux);
-        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBOZBs9ZAPehMBXhAWq1AEOFJyZCgZBJZCxPZBczSwb47FElRP1ZBtRQdueg4SYiYtLn6NVq7OMtCCobQPjg7260Sig1s7vfvfSA1uwsjcHdmjImVHB6TwTOD9fzVsryG0ZAbEvC2Rq6vC3DFsfjHsZBIznPW2cHDGxcQNarZAPBR61rSRYpcG4FYWU1Q8tJpCovNZAlvosnxo1CfTrgVu86L57TFiZAYZD";
+        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO8wJDDHTZBSYUXqlq8d9bGWZAfeT5KdVbOb3syn3qWZCGhmLiaDy03ebNuPsZCuxMniswvZCxbuh2oMlOV";
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, 1);

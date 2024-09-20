@@ -34,13 +34,13 @@ class Usuario
 
     }
 
-    public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id) // Por defecto 1 hora
+    public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
     {
         $redis = getRedisConnection();
 
-        $userId = uniqid('user:', true); //ID unico para el usuario
+        $userId = uniqid('user:', true); // ID único para el usuario
 
-        //aca se crea un hash con los datos del usuario
+        // Crear un hash con los datos del usuario
         $userData = [
             'name' => $nombre,
             'lastname' => $apellido,
@@ -55,15 +55,22 @@ class Usuario
             'municipio_id' => $municipio_id
         ];
 
-        $expiration = 3600; // equivale a una hora
-        // Acá almacenamos el hash en redis
+        $expiration = 3600; // Expiración de 1 hora
+
+        // Almacenar los datos del usuario como un hash
         $redis->hmset($userId, $userData);
 
         $redis->expire($userId, $expiration);
 
-        return $userId;
+        // **Almacenar la relación del teléfono con el ID del usuario**
+        $redis->set('user:' . $telefono, $userId);
 
+        // Establecer el tiempo de expiración para la relación de teléfono
+        $redis->expire('user:' . $telefono, $expiration);
+
+        return $userId;
     }
+
 
     public static function getUser($userId)
     {

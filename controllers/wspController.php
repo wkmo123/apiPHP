@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . "/../models/wsp.php";
+require_once __DIR__ . "/../models/usuario.php";
+
 
 class WspController
 {
@@ -47,10 +49,36 @@ class WspController
         $resultado = Wsp::validarOTP($numero, $otp);
 
         if ($resultado > 0) {
-            echo json_encode([
-                "status" => "success",
-                "message" => "OTP validado correctamente"
-            ]);
+
+            $redis = new Predis\Client();
+            $userId = $redis->get("user:$numero");
+
+            error_log("el id del usuario en redis es de: " . $userId);
+
+            if ($userId) {
+                $userData = $redis->hgetall($userId);
+
+                if ($userData) {
+                    echo json_encode([
+                        "status" => "success",
+                        "message" => "OTP validado correctamente",
+                        "user" => $userData
+
+
+                    ]);
+                } else {
+                    echo json_encode([
+                        "status" => "error",
+                        "message" => "Datos del usuario no encontrados en Redis."
+                    ]);
+                }
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Usuario no encontrado en Redis."
+                ]);
+            }
+
         } else {
             echo json_encode([
                 "status" => "error",
@@ -67,20 +95,20 @@ class WspController
             "to" => $number,
             "type" => "template",
             "template" => array(
-                "name" => "codverification",
-                "language" => array(
-                    "code" => "es"
-                ),
-                "components" => array(
-                    array(
-                        "type" => "body",
-                        "parameters" => array(
-                            array("type" => "text", "text" => "*" . $name . "*"),
-                            array("type" => "text", "text" => "*" . $cod . "*")
+                    "name" => "codverification",
+                    "language" => array(
+                            "code" => "es"
+                        ),
+                    "components" => array(
+                        array(
+                            "type" => "body",
+                            "parameters" => array(
+                                    array("type" => "text", "text" => "*" . $name . "*"),
+                                    array("type" => "text", "text" => "*" . $cod . "*")
+                                )
                         )
                     )
                 )
-            )
         );
         $url = "https://graph.facebook.com/v15.0/105386462411555/messages";
         return $this->bodyrequestAPI($post, $url);

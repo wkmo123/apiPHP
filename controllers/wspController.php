@@ -36,25 +36,24 @@ class WspController
         $numero = $request["numero"] ?? "";
         $otp = $request["otp"] ?? "";
 
-
-        if ((empty($numero) || empty($otp))) {
+        if (empty($numero) || empty($otp)) {
             echo json_encode([
                 "status" => "error",
-
-                "message" => "El numero de telefono y el OTP son obligatorios"
+                "message" => "El número de teléfono y el OTP son obligatorios"
             ]);
             return;
         }
 
+        // Valida el OTP con MySQL
         $resultado = Wsp::validarOTP($numero, $otp);
 
         if ($resultado > 0) {
 
+            // Obtener el ID de usuario con el número de teléfono desde MySQL
             $userId = Usuario::traerIdByNumero($numero);
 
-            error_log("el id del usuario en redis es de: " . $userId);
-
             if ($userId) {
+                // Obtener los datos del usuario por ID desde MySQL
                 $userData = Usuario::getAllById($userId);
 
                 if ($userData) {
@@ -63,6 +62,8 @@ class WspController
                         "message" => "OTP validado correctamente",
                         "user" => $userData
                     ]);
+
+                    // Asignar valores de usuario
                     $name = $userData['name'] ?? '';
                     $lastname = $userData['lastname'] ?? '';
                     $email = $userData['email'] ?? '';
@@ -75,7 +76,8 @@ class WspController
                     $confCorreo = $userData['confCorreo'] ?? 0;
                     $municipio_id = $userData['municipio_id'] ?? null;
 
-                    $result = Usuario::save(
+                    // Guardar o actualizar los datos del usuario en MySQL
+                    $result = Usuario::saveUser(
                         $name,
                         $lastname,
                         $email,
@@ -88,31 +90,33 @@ class WspController
                         $confCorreo,
                         $municipio_id
                     );
+
                     if ($result) {
-                        error_log("Usuario registrado en Redis correctamente con ID: " . $result);
+                        error_log("Usuario registrado correctamente con ID: " . $result);
                     } else {
-                        error_log("Error al registrar el usuario en Redis.");
+                        error_log("Error al registrar el usuario en MySQL.");
                     }
                 } else {
                     echo json_encode([
                         "status" => "error",
-                        "message" => "Datos del usuario no encontrados en Redis."
+                        "message" => "Datos del usuario no encontrados en la base de datos."
                     ]);
                 }
             } else {
                 echo json_encode([
                     "status" => "error",
-                    "message" => "Usuario no encontrado en Redis."
+                    "message" => "Usuario no encontrado en la base de datos."
                 ]);
             }
 
         } else {
             echo json_encode([
                 "status" => "error",
-                "message" => "OTP invalido o numero incorrecto"
+                "message" => "OTP inválido o número incorrecto"
             ]);
         }
     }
+
 
     private function apiWsp($numberuser, $name, $cod)
     {
@@ -146,7 +150,7 @@ class WspController
         header('Content-Type: application/json');
         $ch = curl_init($url);
         $post = json_encode($postaux);
-        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO8wJDDHTZBSYUXqlq8d9bGWZAfeT5KdVbOb3syn3qWZCGhmLiaDy03ebNuPsZCuxMniswvZCxbuh2oMlOVVweZAeViuxZCgA4x2WxuIZCEksil8DzZBulKVoGAWPKQZC8IXSMS3ZC7oDMicnOMAZAYVs9qT6XIw7gAuyHtXoxbd6j2OhyEDxsE8rtejZBRfSVud5L15wYPOAsGvvMV6T6HBxLeQHEGmAZD";
+        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO0ZAvH79wLVjnKs1ZCeA3sbt7q2ZASpm85xMMnbUR6NKbikQIBXvR2q6CygZCZCtG4JS7stNuucrWmnp3IW2gkOOzkMs2oWKGaCO7IZAPylhXliiEZAJlnTuAlWgzq1ylPczLIYeo8O5HyMd42OWT66idz2hSVVqEejtrdFIsEUxN4dnbNROuXNEZAFEiIBDdwwrL1jSXzbDP6OZAxTMTZCTodaPUZD";
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, 1);

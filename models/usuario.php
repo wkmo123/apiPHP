@@ -34,14 +34,45 @@ class Usuario
 
     }
 
+    public static function saveUser($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
+    {
+        $db = getConnection();
+
+        $sql = "INSERT INTO users (name, lastname, email, cedula, password, telefono, direccion, user_type, id_estado, confCorreo, municipio_id)
+                VALUES (:name, :lastname, :email, :cedula, :password, :telefono, :direccion, :user_type, :id_estado, :confCorreo, :municipio_id)";
+
+        $stmt = $db->prepare($sql);
+
+        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+
+        $stmt->execute([
+            ':name' => $nombre,
+            ':lastname' => $apellido,
+            ':email' => $correo,
+            ':cedula' => $cedula,
+            ':password' => $passwordHash, // Encriptada
+            ':telefono' => $telefono,
+            ':direccion' => $direccion,
+            ':user_type' => $user_type,
+            ':id_estado' => $id_estado,
+            ':confCorreo' => $confCorreo,
+            ':municipio_id' => $municipio_id
+        ]);
+
+
+        return $stmt->rowCount();
+
+    }
+
 
     public static function traerIdByNumero($numero)
     {
         $db = getConnection();
         $stmt = $db->prepare("SELECT idUser FROM pre_registro WHERE telefono = ?");
         $stmt->execute([$numero]);
-        return $stmt->fetchAll();
+        return $stmt->fetchColumn();  // Esto devuelve solo el valor de la columna idUser
     }
+
 
 
     public static function getAllById($id)
@@ -49,8 +80,11 @@ class Usuario
         $db = getConnection();
         $stmt = $db->prepare("SELECT * FROM pre_registro WHERE idUser = ?");
         $stmt->execute([$id]);
-        return $stmt->fetchAll();
+        $results = $stmt->fetchAll();  // Esto devuelve un array de resultados
+        return $results;  
     }
+    
+
     /*
         public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
         {

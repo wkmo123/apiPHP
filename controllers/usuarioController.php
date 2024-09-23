@@ -28,7 +28,7 @@ class UsuarioController
         }
 
         // Intentar insertar el nuevo usuario en la base de datos
-        $result = Usuario::saveRedis($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
+        $result = Usuario::save($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
 
         // Verificar si la inserción fue exitosa
         if ($result) {

@@ -1,5 +1,5 @@
 <?php
-
+/*
 require 'D:\xampp\htdocs\api\vendor/autoload.php';
 
 
@@ -13,3 +13,4 @@ function getRedisConnection()
 
     return $client;
 }
+    */

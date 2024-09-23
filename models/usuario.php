@@ -8,7 +8,7 @@ class Usuario
     {
         $db = getConnection();
 
-        $sql = "INSERT INTO users (name, lastname, email, cedula, password, telefono, direccion, user_type, id_estado, confCorreo, municipio_id)
+        $sql = "INSERT INTO pre_registro (name, lastname, email, cedula, password, telefono, direccion, user_type, id_estado, confCorreo, municipio_id)
                 VALUES (:name, :lastname, :email, :cedula, :password, :telefono, :direccion, :user_type, :id_estado, :confCorreo, :municipio_id)";
 
         $stmt = $db->prepare($sql);
@@ -34,47 +34,67 @@ class Usuario
 
     }
 
-    public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
+
+    public static function traerIdByNumero($numero)
     {
-        $redis = getRedisConnection();
-
-        $userId = uniqid('user:', true); // ID único para el usuario
-
-        // Crear un hash con los datos del usuario
-        $userData = [
-            'name' => $nombre,
-            'lastname' => $apellido,
-            'email' => $correo,
-            'cedula' => $cedula,
-            'password' => password_hash($password, PASSWORD_BCRYPT), // Encriptar la contraseña
-            'telefono' => $telefono,
-            'direccion' => $direccion,
-            'user_type' => $user_type,
-            'id_estado' => $id_estado,
-            'confCorreo' => $confCorreo,
-            'municipio_id' => $municipio_id
-        ];
-
-        $expiration = 3600; // Expiración de 1 hora
-
-        // Almacenar los datos del usuario como un hash
-        $redis->hmset($userId, $userData);
-
-        $redis->expire($userId, $expiration);
-
-        // **Almacenar la relación del teléfono con el ID del usuario**
-        $redis->set('user:' . $telefono, $userId);
-
-        // Establecer el tiempo de expiración para la relación de teléfono
-        $redis->expire('user:' . $telefono, $expiration);
-
-        return $userId;
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT idUser FROM pre_registro WHERE telefono = ?");
+        $stmt->execute([$numero]);
+        return $stmt->fetchAll();
     }
 
 
-    public static function getUser($userId)
+    public static function getAllById($id)
     {
-        $redis = getRedisConnection();
-        return $redis->hgetall($userId);
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT * FROM pre_registro WHERE idUser = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetchAll();
     }
+    /*
+        public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
+        {
+            $redis = getRedisConnection();
+
+            $userId = uniqid('user:', true); // ID único para el usuario
+
+            // Crear un hash con los datos del usuario
+            $userData = [
+                'name' => $nombre,
+                'lastname' => $apellido,
+                'email' => $correo,
+                'cedula' => $cedula,
+                'password' => password_hash($password, PASSWORD_BCRYPT), // Encriptar la contraseña
+                'telefono' => $telefono,
+                'direccion' => $direccion,
+                'user_type' => $user_type,
+                'id_estado' => $id_estado,
+                'confCorreo' => $confCorreo,
+                'municipio_id' => $municipio_id
+            ];
+
+            $expiration = 3600; // Expiración de 1 hora
+
+            // Almacenar los datos del usuario como un hash
+            $redis->hmset($userId, $userData);
+
+            $redis->expire($userId, $expiration);
+
+            // **Almacenar la relación del teléfono con el ID del usuario**
+            $redis->set('user:' . $telefono, $userId);
+
+            // Establecer el tiempo de expiración para la relación de teléfono
+            $redis->expire('user:' . $telefono, $expiration);
+
+            return $userId;
+        }
+
+         public static function getUser($userId)
+        {
+            $redis = getRedisConnection();
+            return $redis->hgetall($userId);
+        }
+    */
+
+
 }

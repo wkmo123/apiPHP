@@ -50,13 +50,12 @@ class WspController
 
         if ($resultado > 0) {
 
-            $redis = new Predis\Client();
-            $userId = $redis->get("user:$numero");
+            $userId = Usuario::traerIdByNumero($numero);
 
             error_log("el id del usuario en redis es de: " . $userId);
 
             if ($userId) {
-                $userData = $redis->hgetall($userId);
+                $userData = Usuario::getAllById($userId);
 
                 if ($userData) {
                     echo json_encode([

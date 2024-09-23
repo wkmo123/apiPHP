@@ -34,8 +34,7 @@ class UsuarioController
         if ($result) {
             echo json_encode([
                 "status" => "success",
-                "message" => "Usuario registrado correctamente.",
-                "userId" => $result
+                "message" => "Usuario registrado correctamente."
             ]);
         } else {
             echo json_encode([

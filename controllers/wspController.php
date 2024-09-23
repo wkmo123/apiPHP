@@ -65,7 +65,7 @@ class WspController
                     $user = $userData[0];
                     // Asignar valores de usuario
                     $name = $user['name'] ?? '';
-                    $lastname = $user['lastname'] ?? '';
+                    $lastname = $user['lastName'] ?? '';
                     $email = $user['email'] ?? '';
                     $cedula = $user['cedula'] ?? '';
                     $password = $user['password'] ?? '';
@@ -91,8 +91,10 @@ class WspController
                         $municipio_id
                     );
 
+                    Usuario::deleteById($userId);
                     if ($result) {
                         error_log("Usuario registrado correctamente con ID: " . $result);
+
                     } else {
                         error_log("Error al registrar el usuario en MySQL.");
                     }

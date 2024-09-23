@@ -81,9 +81,20 @@ class Usuario
         $stmt = $db->prepare("SELECT * FROM pre_registro WHERE idUser = ?");
         $stmt->execute([$id]);
         $results = $stmt->fetchAll();  // Esto devuelve un array de resultados
-        return $results;  
+        return $results;
     }
-    
+
+    public static function deleteById($id)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("DELETE FROM pre_registro WHERE idUser = ?");
+        if ($stmt->execute([$id])) {
+            return true;  // Borrado exitoso
+        } else {
+            return false;  // Error al borrar
+        }
+    }
+
 
     /*
         public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)

@@ -73,7 +73,7 @@ class WspController
                     $direccion = $user['direccion'] ?? '';
                     $user_type = $user['user_type'] ?? 'user';
                     $id_estado = $user['id_estado'] ?? 1;
-                    $confCorreo = $user['confCorreo'] ?? 0;
+                    $confCorreo = $user['confCorreo'] ?? 1;
                     $municipio_id = $user['municipio_id'] ?? null;
 
                     // Guardar o actualizar los datos del usuario en MySQL

@@ -62,19 +62,19 @@ class WspController
                         "message" => "OTP validado correctamente",
                         "user" => $userData
                     ]);
-
+                    $user = $userData[0];
                     // Asignar valores de usuario
-                    $name = $userData['name'] ?? '';
-                    $lastname = $userData['lastname'] ?? '';
-                    $email = $userData['email'] ?? '';
-                    $cedula = $userData['cedula'] ?? '';
-                    $password = $userData['password'] ?? '';
-                    $telefono = $userData['telefono'] ?? '';
-                    $direccion = $userData['direccion'] ?? '';
-                    $user_type = $userData['user_type'] ?? 'user';
-                    $id_estado = $userData['id_estado'] ?? 1;
-                    $confCorreo = $userData['confCorreo'] ?? 0;
-                    $municipio_id = $userData['municipio_id'] ?? null;
+                    $name = $user['name'] ?? '';
+                    $lastname = $user['lastname'] ?? '';
+                    $email = $user['email'] ?? '';
+                    $cedula = $user['cedula'] ?? '';
+                    $password = $user['password'] ?? '';
+                    $telefono = $user['telefono'] ?? '';
+                    $direccion = $user['direccion'] ?? '';
+                    $user_type = $user['user_type'] ?? 'user';
+                    $id_estado = $user['id_estado'] ?? 1;
+                    $confCorreo = $user['confCorreo'] ?? 0;
+                    $municipio_id = $user['municipio_id'] ?? null;
 
                     // Guardar o actualizar los datos del usuario en MySQL
                     $result = Usuario::saveUser(

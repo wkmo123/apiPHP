@@ -39,29 +39,36 @@ class Usuario
         $db = getConnection();
 
         $sql = "INSERT INTO users (name, lastname, email, cedula, password, telefono, direccion, user_type, id_estado, confCorreo, municipio_id)
-                VALUES (:name, :lastname, :email, :cedula, :password, :telefono, :direccion, :user_type, :id_estado, :confCorreo, :municipio_id)";
+            VALUES (:name, :lastname, :email, :cedula, :password, :telefono, :direccion, :user_type, :id_estado, :confCorreo, :municipio_id)";
 
         $stmt = $db->prepare($sql);
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-        $stmt->execute([
-            ':name' => $nombre,
-            ':lastname' => $apellido,
-            ':email' => $correo,
-            ':cedula' => $cedula,
-            ':password' => $passwordHash, // Encriptada
-            ':telefono' => $telefono,
-            ':direccion' => $direccion,
-            ':user_type' => $user_type,
-            ':id_estado' => $id_estado,
-            ':confCorreo' => $confCorreo,
-            ':municipio_id' => $municipio_id
-        ]);
+        try {
+            $stmt->execute([
+                ':name' => $nombre,
+                ':lastname' => $apellido,
+                ':email' => $correo,
+                ':cedula' => $cedula,
+                ':password' => $passwordHash, // Encriptada
+                ':telefono' => $telefono,
+                ':direccion' => $direccion,
+                ':user_type' => $user_type,
+                ':id_estado' => $id_estado,
+                ':confCorreo' => $confCorreo,
+                ':municipio_id' => $municipio_id
+            ]);
 
-
-        return $stmt->rowCount();
-
+            return $stmt->rowCount(); // Retorna el número de filas afectadas
+        } catch (PDOException $e) {
+            // Manejo del error: puedes registrar el error o lanzarlo según sea necesario
+            error_log("Error al guardar el usuario: " . $e->getMessage()); // Registra el error
+            return [
+                'status' => 'error',
+                'message' => 'No se pudo guardar el usuario: ' . $e->getMessage() // Mensaje de error
+            ];
+        }
     }
 
 
@@ -97,7 +104,7 @@ class Usuario
 
     public static function findByEmailOrCedula($email, $cedula)
     {
-        $db = getConnection(); 
+        $db = getConnection();
 
         $query = $db->prepare("SELECT * FROM user WHERE email = :email OR cedula = :cedula LIMIT 1");
         $query->execute([

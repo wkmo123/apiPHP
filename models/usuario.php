@@ -95,6 +95,18 @@ class Usuario
         }
     }
 
+    public static function findByEmailOrCedula($email, $cedula)
+    {
+        $db = getConnection(); 
+
+        $query = $db->prepare("SELECT * FROM user WHERE email = :email OR cedula = :cedula LIMIT 1");
+        $query->execute([
+            ':email' => $email,
+            ':cedula' => $cedula
+        ]);
+
+        return $query->fetch(PDO::FETCH_ASSOC); // Retorna el usuario si existe o false si no
+    }
 
     /*
         public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)

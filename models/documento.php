@@ -15,7 +15,7 @@ class Documento
         try {
             $stmt->execute([
                 ':id_abogado' => $id_abogado,
-                ':tipo_documeto' => $tipo_documento,
+                ':tipo_documento' => $tipo_documento,
                 ':ruta_archivo' => $ruta_archivo,
                 ':fecha_subida' => $fecha_subida
             ]);

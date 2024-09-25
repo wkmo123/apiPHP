@@ -106,7 +106,7 @@ class Usuario
     {
         $db = getConnection();
 
-        $query = $db->prepare("SELECT * FROM user WHERE email = :email OR cedula = :cedula LIMIT 1");
+        $query = $db->prepare("SELECT * FROM users WHERE email = :email OR cedula = :cedula LIMIT 1");
         $query->execute([
             ':email' => $email,
             ':cedula' => $cedula

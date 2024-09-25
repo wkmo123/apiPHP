@@ -6,6 +6,7 @@ class UsuarioController
 
     public function insertarUsuario($request)
     {
+        // Extraer datos del request con valores por defecto
         $name = $request['name'] ?? '';
         $lastname = $request['lastname'] ?? '';
         $email = $request['email'] ?? '';
@@ -27,6 +28,17 @@ class UsuarioController
             return;
         }
 
+        // Verificar si el usuario ya existe
+        $existingUser = Usuario::findByEmailOrCedula($email, $cedula);
+        if ($existingUser) {
+            http_response_code(409); // Conflict
+            echo json_encode([
+                "status" => "error",
+                "message" => "El usuario ya está registrado con este email o cédula."
+            ]);
+            return; // Salir de la función si ya existe el usuario
+        }
+
         // Intentar insertar el nuevo usuario en la base de datos
         $result = Usuario::save($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
 
@@ -43,4 +55,5 @@ class UsuarioController
             ]);
         }
     }
+
 }

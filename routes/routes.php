@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../controllers/DepartamentoController.php';
 require_once __DIR__ . '/../controllers/municipioController.php';
+require_once __DIR__ . '/../controllers/departamentoController.php';
 require_once __DIR__ . '/../controllers/usuarioController.php';
 require_once __DIR__ . '/../controllers/wspController.php';
 require_once __DIR__ . '/../controllers/documentoController.php';

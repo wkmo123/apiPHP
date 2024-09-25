@@ -4,6 +4,8 @@ require_once __DIR__ . '/../controllers/DepartamentoController.php';
 require_once __DIR__ . '/../controllers/municipioController.php';
 require_once __DIR__ . '/../controllers/usuarioController.php';
 require_once __DIR__ . '/../controllers/wspController.php';
+require_once __DIR__ . '/../controllers/documentoController.php';
+
 
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
@@ -14,6 +16,8 @@ $routes = [
     '/api/usuarios/registro' => ['POST', 'UsuarioController', 'insertarUsuario'],
     '/api/usuarios/enviar-otp' => ['POST', 'WspController', 'sendMessage'],
     '/api/usuarios/verificar-otp' => ['POST', 'WspController', 'validarOTP'],
+    '/api/documentos/subir' => ['POST', 'DocumentosController', 'insertarDocumentos'],
+
 ];
 
 if (preg_match('/\/api\/ciudades\/(\d+)/', $url, $matches) && $method === 'GET') {

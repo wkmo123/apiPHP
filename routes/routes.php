@@ -16,7 +16,7 @@ $routes = [
     '/api/usuarios/registro' => ['POST', 'UsuarioController', 'insertarUsuario'],
     '/api/usuarios/enviar-otp' => ['POST', 'WspController', 'sendMessage'],
     '/api/usuarios/verificar-otp' => ['POST', 'WspController', 'validarOTP'],
-    '/api/documentos/subir' => ['POST', 'DocumentosController', 'insertarDocumentos'],
+    '/api/documentos/subir' => ['POST', 'DocumentoController', 'insertarDocumentos'],
 
 ];
 

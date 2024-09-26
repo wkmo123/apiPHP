@@ -10,9 +10,9 @@ class LoginController
     public function login($request)
     {
         error_log(print_r($_POST, true));
-        
-        $email = $_POST['email'] ?? null;
-        $password = $_POST['password'] ?? null;
+
+        $email = $request['email'] ?? null;
+        $password = $request['password'] ?? null;
 
 
         if (empty($email) || empty($password)) {

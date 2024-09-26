@@ -6,7 +6,7 @@ class Login
     {
         $db = getConnection(); // Obtener la conexión a la base de datos
 
-        $sql = "SELECT idUser, password FROM users WHERE email = :email LIMIT 1";
+        $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
         $stmt = $db->prepare($sql);
 
         try {

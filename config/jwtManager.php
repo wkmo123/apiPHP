@@ -10,20 +10,18 @@ class JwtManager
 
     private static $algorithm = 'HS256';
 
-    public static function createToken($idUser, $email)
+    public static function createToken($idUser, $name, $role)
     {
         $issuedAdt = time();
         $expiration = $issuedAdt + 3600;
 
         //Payload del JWT
         $payload = [
-
-            'iat' => $issuedAdt,
-            'exp' => $expiration,
-            'data' => [
-                'idUser' => $idUser,
-                'email' => $email
-            ]
+            'sub' => $idUser,   // Identificador del usuario
+            'name' => $name,    // Nombre del usuario
+            'role' => $role,    // Rol del usuario
+            'iat' => $issuedAdt, // Fecha de emisión
+            'exp' => $expiration // Fecha de expiración
         ];
 
         //Generar el token usando encode 
@@ -34,7 +32,7 @@ class JwtManager
     {
         try {
             $decoded = JWT::decode($token, new Key(self::$secretKey, self::$algorithm));
-            return (array) $decoded->data;
+            return (array) $decoded;
         } catch (Exception $e) {
             return false;
         }

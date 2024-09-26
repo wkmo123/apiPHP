@@ -27,7 +27,7 @@ class LoginController
 
         if ($user) {
 
-            $jwt = JwtManager::createToken($user['idUser'], $user['name'],$user['role']);
+            $jwt = JwtManager::createToken($user['idUser'], $user['name'],$user['user_type']);
 
             echo json_encode([
                 "status" => "success",

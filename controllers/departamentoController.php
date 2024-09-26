@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../models/Departamento.php';
-require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+
 
 
 class DepartamentoController

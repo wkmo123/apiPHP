@@ -5,6 +5,7 @@ require_once __DIR__ . '/../controllers/departamentoController.php';
 require_once __DIR__ . '/../controllers/usuarioController.php';
 require_once __DIR__ . '/../controllers/wspController.php';
 require_once __DIR__ . '/../controllers/documentoController.php';
+require_once __DIR__ . '/../controllers/loginController.php';
 
 
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -17,6 +18,7 @@ $routes = [
     '/api/usuarios/enviar-otp' => ['POST', 'WspController', 'sendMessage'],
     '/api/usuarios/verificar-otp' => ['POST', 'WspController', 'validarOTP'],
     '/api/documentos/subir' => ['POST', 'DocumentoController', 'insertarDocumentos'],
+    '/api/usuarios/login' => ['POST', 'LoginController', 'login'],
 
 ];
 

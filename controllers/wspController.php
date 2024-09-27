@@ -31,6 +31,31 @@ class WspController
 
     }
 
+    public function recuperarPass($request)
+    {
+
+        $number = $request["number"] ?? "";
+        $name = $request["name"] ?? "";
+        $cod = $request["cod"] ?? "";
+
+
+        if ((empty($number) || empty($name)) || empty($cod)) {
+
+            echo json_encode([
+                "status" => "error",
+                "message" => "Todos los campos son obligatorios"
+            ]);
+
+            return;
+        }
+
+        $response = $this->recoverPass($number, $name, $cod);
+        $result = Wsp::guardarOTP($number, $cod);
+
+        echo $response;
+
+    }
+
     public function validarOTP($request)
     {
         $numero = $request["numero"] ?? "";
@@ -120,6 +145,31 @@ class WspController
     }
 
 
+    private function validarOTPPass($request)
+    {
+        $numero = $request["numero"] ?? "";
+        $otp = $request["otp"] ?? "";
+
+        if (empty($numero) || empty($otp)) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "El número de teléfono y el OTP son obligatorios"
+            ]);
+            return;
+        }
+
+        // Valida el OTP con MySQL
+        $resultado = Wsp::validarOTPPass($numero, $otp);
+
+        if ($resultado > 0) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "OTP validado correctamente, ahora cambie la contrase;a",
+            ]);
+        }
+    }
+
+
     private function apiWsp($numberuser, $name, $cod)
     {
         $number = "57" . $numberuser;
@@ -128,7 +178,34 @@ class WspController
             "to" => $number,
             "type" => "template",
             "template" => array(
-                "name" => "codverification",
+                "name" => "recuperapass", // para recuperar password recuperapass  y para verificacion codverification
+                "language" => array(
+                    "code" => "es"
+                ),
+                "components" => array(
+                    array(
+                        "type" => "body",
+                        "parameters" => array(
+                            array("type" => "text", "text" => "*" . $name . "*"),
+                            array("type" => "text", "text" => "*" . $cod . "*")
+                        )
+                    )
+                )
+            )
+        );
+        $url = "https://graph.facebook.com/v15.0/105386462411555/messages";
+        return $this->bodyrequestAPI($post, $url);
+    }
+
+    private function recoverPass($numberuser, $name, $cod)
+    {
+        $number = "57" . $numberuser;
+        $post = array(
+            "messaging_product" => "whatsapp",
+            "to" => $number,
+            "type" => "template",
+            "template" => array(
+                "name" => "recuperapass", // para recuperar password recuperapass  y para verificacion codverification
                 "language" => array(
                     "code" => "es"
                 ),
@@ -152,7 +229,7 @@ class WspController
         header('Content-Type: application/json');
         $ch = curl_init($url);
         $post = json_encode($postaux);
-        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO0ZAvH79wLVjnKs1ZCeA3sbt7q2ZASpm85xMMnbUR6NKbikQIBXvR2q6CygZCZCtG4JS7stNuucrWmnp3IW2gkOOzkMs2oWKGaCO7IZAPylhXliiEZAJlnTuAlWgzq1ylPczLIYeo8O5HyMd42OWT66idz2hSVVqEejtrdFIsEUxN4dnbNROuXNEZAFEiIBDdwwrL1jSXzbDP6OZAxTMTZCTodaPUZD";
+        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO2YYM7TQYlWQRXl8AuAyDzxPEIuArUj9rlChBwFhtfXZAVdZC6kWUCWgUGlOZCodMWzNZAbWnHgAIZBP0soPcWf27qQunfUWcelZAdgqbKA09AAFk3k4WKdeKB1r5qin0yUwZCY4XasX93sZCu1mqZCmCl4obZAVISuiAlTZAlVcM8LDnoaPrg9IEuS3cYp0KqLZBoP6EInNZBsZCuZAYFG6CUohG4m4EsZD";
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, 1);

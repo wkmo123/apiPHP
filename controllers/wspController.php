@@ -36,10 +36,10 @@ class WspController
 
         $number = $request["number"] ?? "";
         $name = $request["name"] ?? "";
-        $cod = $request["cod"] ?? "";
+        //$cod = $request["cod"] ?? "";
 
 
-        if ((empty($number) || empty($name)) || empty($cod)) {
+        if ((empty($number) || empty($name))) {
 
             echo json_encode([
                 "status" => "error",
@@ -48,9 +48,9 @@ class WspController
 
             return;
         }
-
+        $cod = rand(100000, 999999);
         $response = $this->recoverPass($number, $name, $cod);
-        $result = Wsp::guardarOTP($number, $cod);
+        $result = Wsp::guardarOTPpass($number, $cod);
 
         echo $response;
 
@@ -158,14 +158,18 @@ class WspController
             return;
         }
 
+        $id = Usuario::traerIdByOTP($otp);
         // Valida el OTP con MySQL
         $resultado = Wsp::validarOTPPass($numero, $otp);
+        Usuario::deleteOTPtemporal($id);
 
         if ($resultado > 0) {
             echo json_encode([
                 "status" => "success",
                 "message" => "OTP validado correctamente, ahora cambie la contrase;a",
             ]);
+
+
         }
     }
 
@@ -178,7 +182,7 @@ class WspController
             "to" => $number,
             "type" => "template",
             "template" => array(
-                "name" => "recuperapass", // para recuperar password recuperapass  y para verificacion codverification
+                "name" => "codverification", // para recuperar password recuperapass  y para verificacion codverification
                 "language" => array(
                     "code" => "es"
                 ),
@@ -205,7 +209,7 @@ class WspController
             "to" => $number,
             "type" => "template",
             "template" => array(
-                "name" => "recuperapass", // para recuperar password recuperapass  y para verificacion codverification
+                "name" => "passwordrec", // para recuperar password recuperapass  y para verificacion codverification
                 "language" => array(
                     "code" => "es"
                 ),

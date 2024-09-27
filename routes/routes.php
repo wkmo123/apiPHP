@@ -19,6 +19,8 @@ $routes = [
     '/api/usuarios/verificar-otp' => ['POST', 'WspController', 'validarOTP'],
     '/api/documentos/subir' => ['POST', 'DocumentoController', 'insertarDocumentos'],
     '/api/usuarios/login' => ['POST', 'LoginController', 'login'],
+    '/api/usuarios/recoverPassword' => ['POST', 'WspController', 'recuperarPass'],
+    '/api/usuarios/verificarOTP-pass' => ['POST', 'WspController', 'validarOTPPass'],
 
 ];
 

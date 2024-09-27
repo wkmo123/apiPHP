@@ -80,6 +80,14 @@ class Usuario
         return $stmt->fetchColumn();  // Esto devuelve solo el valor de la columna idUser
     }
 
+    public static function traerIdByOTP($otp)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT id_temp FROM temppass WHERE otp = ?");
+        $stmt->execute([$otp]);
+        return $stmt->fetchColumn();
+    }
+
 
 
     public static function getAllById($id)
@@ -96,6 +104,17 @@ class Usuario
         $db = getConnection();
         $stmt = $db->prepare("DELETE FROM pre_registro WHERE idUser = ?");
         if ($stmt->execute([$id])) {
+            return true;  // Borrado exitoso
+        } else {
+            return false;  // Error al borrar
+        }
+    }
+
+    public static function deleteOTPtemporal($otp)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("DELETE FROM temppass WHERE otp = ?");
+        if ($stmt->execute([$otp])) {
             return true;  // Borrado exitoso
         } else {
             return false;  // Error al borrar

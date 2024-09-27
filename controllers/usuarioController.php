@@ -56,4 +56,31 @@ class UsuarioController
         }
     }
 
+    public function cambiarPassword($request)
+    {
+        $telefono = $request['telefono'] ?? '';
+        $password = $request['password'] ?? '';
+
+        if (empty($telefono) || empty($password)) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Todos los campos obligatorios deben ser completados."
+            ]);
+            return;
+        }
+
+        $result = Usuario::cambiarpassword($telefono, $password);
+        if ($result) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Contraseña cambiada correctamente."
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Error al cambiar la contraseña, intentelo de nuevo"
+            ]);
+        }
+    }
+
 }

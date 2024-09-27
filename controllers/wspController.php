@@ -145,7 +145,7 @@ class WspController
     }
 
 
-    private function validarOTPPass($request)
+    public function validarOTPPass($request)
     {
         $numero = $request["numero"] ?? "";
         $otp = $request["otp"] ?? "";
@@ -159,20 +159,19 @@ class WspController
         }
 
         $id = Usuario::traerIdByOTP($otp);
-        // Valida el OTP con MySQL
+      //  error_log
         $resultado = Wsp::validarOTPPass($numero, $otp);
         Usuario::deleteOTPtemporal($id);
 
         if ($resultado > 0) {
             echo json_encode([
                 "status" => "success",
-                "message" => "OTP validado correctamente, ahora cambie la contrase;a",
+                "message" => "OTP validado correctamente, ahora cambie la contrase;a"
             ]);
 
 
         }
     }
-
 
     private function apiWsp($numberuser, $name, $cod)
     {
@@ -233,7 +232,7 @@ class WspController
         header('Content-Type: application/json');
         $ch = curl_init($url);
         $post = json_encode($postaux);
-        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO2YYM7TQYlWQRXl8AuAyDzxPEIuArUj9rlChBwFhtfXZAVdZC6kWUCWgUGlOZCodMWzNZAbWnHgAIZBP0soPcWf27qQunfUWcelZAdgqbKA09AAFk3k4WKdeKB1r5qin0yUwZCY4XasX93sZCu1mqZCmCl4obZAVISuiAlTZAlVcM8LDnoaPrg9IEuS3cYp0KqLZBoP6EInNZBsZCuZAYFG6CUohG4m4EsZD";
+        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBOzQ2Mm6V6UzKzAVixZAQzL6cZAqj9Qo9bSZA6NooVQZA9vrDi1ipLmsqg9tXBfvJ7GdBvQCZCiaUkx9t9VHDGPYVxGif5eo2to346ZCq7RVddhxVZAjmkqlSlCqK9t4yZAk9ZBSekNHit1tjSsz7M7LqACPzqe6ZBo2ZA35k9HkN2o3sYBW7u4Q6FOZB32Ovxf11nwZArI0R3uyQMIDcfAVP9EV7ZA4ZBYZD";
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, 1);

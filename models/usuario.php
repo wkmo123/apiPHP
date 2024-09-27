@@ -110,11 +110,11 @@ class Usuario
         }
     }
 
-    public static function deleteOTPtemporal($otp)
+    public static function deleteOTPtemporal($id)
     {
         $db = getConnection();
-        $stmt = $db->prepare("DELETE FROM temppass WHERE otp = ?");
-        if ($stmt->execute([$otp])) {
+        $stmt = $db->prepare("DELETE FROM temppass WHERE id_temp = ?");
+        if ($stmt->execute([$id])) {
             return true;  // Borrado exitoso
         } else {
             return false;  // Error al borrar
@@ -132,6 +132,33 @@ class Usuario
         ]);
 
         return $query->fetch(PDO::FETCH_ASSOC); // Retorna el usuario si existe o false si no
+    }
+
+    public static function cambiarpassword($correo, $newPassword)
+    {
+        $db = getConnection();
+        $sql = "UPDATE users SET password = :newPassword WHERE email = :email";
+        $stmt = $db->prepare($sql);
+
+        $passWord = password_hash($newPassword, PASSWORD_BCRYPT);
+
+        try {
+            $stmt->execute([
+                ":newPassword" => $newPassword,
+                ":email" => $correo
+            ]);
+
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+
+            // Manejo del error: registrar el error o lanzarlo según sea necesario
+            error_log("Error al cambiar la contraseña: " . $e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'No se pudo cambiar la contraseña: ' . $e->getMessage()
+            ];
+        }
+
     }
 
     /*

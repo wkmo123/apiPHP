@@ -70,6 +70,7 @@ class UsuarioController
         }
 
         $result = Usuario::cambiarpassword($telefono, $password);
+        error_log("el resultado es:" . print_r($result, true));
         if ($result) {
             echo json_encode([
                 "status" => "success",

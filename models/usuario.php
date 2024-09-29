@@ -133,7 +133,7 @@ class Usuario
 
         return $query->fetch(PDO::FETCH_ASSOC); // Retorna el usuario si existe o false si no
     }
-
+//cambiar password
     public static function cambiarpassword($telefono, $newPassword)
     {
         $db = getConnection();
@@ -144,7 +144,7 @@ class Usuario
 
         try {
             $stmt->execute([
-                ":newPassword" => $newPassword,
+                ":newPassword" => $passWord,
                 ":telefono" => $telefono
             ]);
 

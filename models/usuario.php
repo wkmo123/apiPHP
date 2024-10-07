@@ -121,6 +121,7 @@ class Usuario
         }
     }
 
+    //encotrar emaila o cedula
     public static function findByEmailOrCedula($email, $cedula)
     {
         $db = getConnection();

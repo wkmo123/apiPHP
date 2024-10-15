@@ -134,7 +134,7 @@ class Usuario
 
         return $query->fetch(PDO::FETCH_ASSOC); // Retorna el usuario si existe o false si no
     }
-//cambiar password
+    //cambiar password
     public static function cambiarpassword($telefono, $newPassword)
     {
         $db = getConnection();
@@ -160,6 +160,26 @@ class Usuario
             ];
         }
 
+    }
+
+    public static function deleteUser($idUser)
+    {
+        $db = getConnection();
+        $sql = "DELE FROM users WHERE idUser = :idUser";
+        $stmt = $db->prepare($sql);
+        try {
+            $stmt->execute([
+                ":idUser" => $idUser
+            ]);
+
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            error_log("Error al elmiinar el usuario: " . $e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => "Error al elmiinar el usuario: " . $e->getMessage()
+            ];
+        }
     }
 
     /*

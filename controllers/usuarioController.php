@@ -84,4 +84,32 @@ class UsuarioController
         }
     }
 
+    public function eliminarUsuario($request)
+    {
+
+        $idUsuario = $request['idUser'];
+        if (empty($idUsuario)) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Debe proporcionar el id del usuario."
+            ]);
+            return;
+        }
+        $result = Usuario::deleteUser($idUsuario);
+
+        if ($result) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Usuario eliminado correctamente."
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Error al eliminar el usuario, intentelo de nuevo"
+            ]);
+        }
+    }
+
+
+
 }

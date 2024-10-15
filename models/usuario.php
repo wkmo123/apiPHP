@@ -165,7 +165,7 @@ class Usuario
     public static function deleteUser($idUser)
     {
         $db = getConnection();
-        $sql = "DELE FROM users WHERE idUser = :idUser";
+        $sql = "DELETE FROM users WHERE idUser = :idUser";
         $stmt = $db->prepare($sql);
         try {
             $stmt->execute([

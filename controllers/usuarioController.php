@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . "/../models/usuario.php";
+require_once __DIR__ . "/../models/wsp.php";
 class UsuarioController
 {
 
@@ -44,6 +45,8 @@ class UsuarioController
 
         // Verificar si la inserción fue exitosa
         if ($result) {
+            $cod = rand(100000, 999999);
+            $this->sendMessage($telefono,$name,$cod);
             echo json_encode([
                 "status" => "success",
                 "message" => "Usuario registrado correctamente.",
@@ -55,6 +58,74 @@ class UsuarioController
                 "message" => "Error al registrar el usuario. Intenta nuevamente."
             ]);
         }
+    }
+
+    //enviar msg 
+    public function sendMessage($number,$name,$cod)
+    {
+
+       
+
+        if ((empty($number) || empty($name)) || empty($cod)) {
+
+            echo json_encode([
+                "status" => "error",
+                "message" => "Todos los campos son obligatorios"
+            ]);
+
+            return;
+        }
+
+        $response = $this->apiWsp($number, $name, $cod);
+        $result = Wsp::guardarOTP($number, $cod);
+
+        echo $response;
+
+    }
+
+    //apiWSP
+    private function apiWsp($numberuser, $name, $cod)
+    {
+        $number = "57" . $numberuser;
+        $post = array(
+            "messaging_product" => "whatsapp",
+            "to" => $number,
+            "type" => "template",
+            "template" => array(
+                "name" => "codverification", // para recuperar password recuperapass  y para verificacion codverification
+                "language" => array(
+                    "code" => "es"
+                ),
+                "components" => array(
+                    array(
+                        "type" => "body",
+                        "parameters" => array(
+                            array("type" => "text", "text" => "*" . $name . "*"),
+                            array("type" => "text", "text" => "*" . $cod . "*")
+                        )
+                    )
+                )
+            )
+        );
+        $url = "https://graph.facebook.com/v15.0/105386462411555/messages";
+        return $this->bodyrequestAPI($post, $url);
+    }
+
+    //bodyRequest
+    private function bodyrequestAPI($postaux, $url)
+    {
+        header('Content-Type: application/json');
+        $ch = curl_init($url);
+        $post = json_encode($postaux);
+        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBO9nzZA1aAXH2C7wpP8ATV5ZBZCxaSz8OxyWayZBZCdFOvCDE09yOgPFMyXMBg33cbuREyYZAc2DVPOnZA5ZBh4xpZC0kVhDHZBUFnAXZCxXEZBIOFgAbKRihSUU2xvVxNn5AZADCH2QVDden9k4hFfvNQfJnsO3CXjYPSnZAUHbJSOLvl1BC2toSd9mgmUzYFX0ZBo4k4PneUAp06TDykGASBasxIViJNQZD";
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
     }
 
     public function cambiarPassword($request)

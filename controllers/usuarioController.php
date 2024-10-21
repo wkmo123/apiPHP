@@ -15,7 +15,7 @@ class UsuarioController
         $password = $request['password'] ?? '';
         $telefono = $request['telefono'] ?? '';
         $direccion = $request['direccion'] ?? '';
-        $user_type = $request['user_type'] ?? 'user'; // Si no se envía, se define como 'user' por defecto
+        $user_type = $request['user_type'] ?? 'user'; // Por defecto 'user'
         $id_estado = $request['id_estado'] ?? 1; // Estado por defecto activo
         $confCorreo = $request['confCorreo'] ?? 0; // Por defecto sin confirmar
         $municipio_id = $request['municipio_id'] ?? null;
@@ -29,7 +29,7 @@ class UsuarioController
             return;
         }
 
-        // Verificar si el usuario ya existe
+        // Verificar si el usuario ya existe por email o cédula
         $existingUser = Usuario::findByEmailOrCedula($email, $cedula);
         if ($existingUser) {
             http_response_code(409); // Conflict
@@ -40,31 +40,48 @@ class UsuarioController
             return; // Salir de la función si ya existe el usuario
         }
 
-        // Intentar insertar el nuevo usuario en la base de datos
-        $result = Usuario::save($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
+        try {
+            // Intentar insertar el nuevo usuario en la base de datos
+            $result = Usuario::save($name, $lastname, $email, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id);
 
-        // Verificar si la inserción fue exitosa
-        if ($result) {
-            $cod = rand(100000, 999999);
-            $this->sendMessage($telefono,$name,$cod);
-            echo json_encode([
-                "status" => "success",
-                "message" => "Usuario registrado correctamente.",
-                "datos" => $result
-            ]);
-        } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Error al registrar el usuario. Intenta nuevamente."
-            ]);
+            // Verificar si la inserción fue exitosa
+            if ($result) {
+                $cod = rand(100000, 999999);
+                $this->sendMessage($telefono, $name, $cod);
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "Usuario registrado correctamente.",
+                    "datos" => $result
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Error al registrar el usuario. Intenta nuevamente."
+                ]);
+            }
+        } catch (PDOException $e) {
+            // Verificar si el error es de clave duplicada (por email o cédula)
+            if ($e->getCode() == 23000) { // Código SQL para error de integridad (clave duplicada)
+                http_response_code(409); // Conflict
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "El usuario ya está registrado con este email o cédula."
+                ]);
+            } else {
+                // Manejar otros errores
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Error: " . $e->getMessage()
+                ]);
+            }
         }
     }
 
     //enviar msg 
-    public function sendMessage($number,$name,$cod)
+    public function sendMessage($number, $name, $cod)
     {
 
-       
+
 
         if ((empty($number) || empty($name)) || empty($cod)) {
 

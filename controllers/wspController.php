@@ -31,6 +31,31 @@ class WspController
 
     }
 
+    public function sendOTP($request)
+    {
+
+        $number = $request["number"] ?? "";
+        $name = $request["name"] ?? "";
+        $cod = $request["cod"] ?? "";
+
+
+        if ((empty($number) || empty($name)) || empty($cod)) {
+
+            echo json_encode([
+                "status" => "error",
+                "message" => "Todos los campos son obligatorios"
+            ]);
+
+            return;
+        }
+
+        $response = $this->apiWsp($number, $name, $cod);
+
+
+        echo $response;
+
+    }
+
     public function recuperarPass($request)
     {
 
@@ -159,7 +184,7 @@ class WspController
             if (!empty($telefono)) {
                 $otp = Usuario::traerOTPbyTelefono($telefono);
 
-                $this->sendMessage([
+                $this->sendOTP([
                     "number" => $telefono,
                     "name" => $name,
                     "cod" => $otp

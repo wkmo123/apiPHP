@@ -182,6 +182,28 @@ class Usuario
         }
     }
 
+
+    public static function traerDatosbyEmail($email)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT telefono, name FROM pre_registro WHERE email = ?");
+        $stmt->execute([$email]);
+        $result = $stmt->fetch();
+
+        // Verificar si se encontró un resultado y devolver ambos valores
+        return $result ? ['telefono' => $result['telefono'], 'name' => $result['name']] : null;
+    }
+
+
+    public static function traerOTPbyTelefono($telefono)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT otp FROM tempotp WHERE numero = ?");
+        $stmt->execute([$telefono]);
+        $result = $stmt->fetch();
+        return $result ? $result['otp'] : null;
+    }
+
     /*
         public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
         {

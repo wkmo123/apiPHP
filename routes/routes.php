@@ -23,6 +23,8 @@ $routes = [
     '/api/usuarios/verificarOTP-pass' => ['POST', 'WspController', 'validarOTPPass'],
     '/api/usuarios/cambiarPassword' => ['POST', 'UsuarioController', 'cambiarPassword'],
     '/api/usuarios/eliminarCuenta' => ['POST', 'UsuarioController', 'eliminarUsuario'],
+    '/api/usuarios/reenviarOTP' => ['POST', 'WspController', 'reenviarOTP'],
+
 
 
 ];

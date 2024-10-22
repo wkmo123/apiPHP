@@ -144,6 +144,47 @@ class WspController
         }
     }
 
+    public function reenviarOTP($request)
+    {
+        $email = $request["email"] ?? "";
+
+        $datosUsuario = Usuario::traerDatosbyEmail($email);
+
+        if ($datosUsuario && isset($datosUsuario['telefono'])) {
+
+            $telefono = $datosUsuario['telefono'];
+            $name = $datosUsuario['name'];
+            error_log("el telefono es: " . $telefono);
+
+            if (!empty($telefono)) {
+                $otp = Usuario::traerOTPbyTelefono($telefono);
+
+                $this->sendMessage([
+                    "number" => $telefono,
+                    "name" => $name,
+                    "cod" => $otp
+                ]);
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "OTP reenviado con éxito."
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "El teléfono no está disponible."
+                ]);
+            }
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "No se encontraron datos para este email."
+            ]);
+        }
+
+
+
+    }
+
 
     public function validarOTPPass($request)
     {
@@ -159,7 +200,7 @@ class WspController
         }
 
         $id = Usuario::traerIdByOTP($otp);
-      //  error_log
+        //  error_log
         $resultado = Wsp::validarOTPPass($numero, $otp);
         Usuario::deleteOTPtemporal($id);
 

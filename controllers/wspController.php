@@ -169,6 +169,7 @@ class WspController
         }
     }
 
+    //reenviar OTP
     public function reenviarOTP($request)
     {
         $email = $request["email"] ?? "";

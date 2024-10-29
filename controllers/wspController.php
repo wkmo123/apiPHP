@@ -81,6 +81,7 @@ class WspController
 
     }
 
+//Validar OTP
     public function validarOTP($request)
     {
         $numero = $request["numero"] ?? "";

@@ -163,6 +163,7 @@ class Usuario
     }
 
     /*
+    //guardar en la base de datos temporal redis
         public static function saveRedis($nombre, $apellido, $correo, $cedula, $password, $telefono, $direccion, $user_type, $id_estado, $confCorreo, $municipio_id)
         {
             $redis = getRedisConnection();

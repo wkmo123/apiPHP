@@ -31,6 +31,31 @@ class WspController
 
     }
 
+    public function sendOTP($request)
+    {
+
+        $number = $request["number"] ?? "";
+        $name = $request["name"] ?? "";
+        $cod = $request["cod"] ?? "";
+
+
+        if ((empty($number) || empty($name)) || empty($cod)) {
+
+            echo json_encode([
+                "status" => "error",
+                "message" => "Todos los campos son obligatorios"
+            ]);
+
+            return;
+        }
+
+        $response = $this->apiWsp($number, $name, $cod);
+
+
+        echo $response;
+
+    }
+
     public function recuperarPass($request)
     {
 
@@ -56,6 +81,7 @@ class WspController
 
     }
 
+//Validar OTP
     public function validarOTP($request)
     {
         $numero = $request["numero"] ?? "";
@@ -144,6 +170,48 @@ class WspController
         }
     }
 
+    //reenviar OTP
+    public function reenviarOTP($request)
+    {
+        $email = $request["email"] ?? "";
+
+        $datosUsuario = Usuario::traerDatosbyEmail($email);
+
+        if ($datosUsuario && isset($datosUsuario['telefono'])) {
+
+            $telefono = $datosUsuario['telefono'];
+            $name = $datosUsuario['name'];
+            error_log("el telefono es: " . $telefono);
+
+            if (!empty($telefono)) {
+                $otp = Usuario::traerOTPbyTelefono($telefono);
+
+                $this->sendOTP([
+                    "number" => $telefono,
+                    "name" => $name,
+                    "cod" => $otp
+                ]);
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "OTP reenviado con éxito."
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "El teléfono no está disponible."
+                ]);
+            }
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "No se encontraron datos para este email."
+            ]);
+        }
+
+
+
+    }
+
 
     public function validarOTPPass($request)
     {
@@ -159,7 +227,7 @@ class WspController
         }
 
         $id = Usuario::traerIdByOTP($otp);
-      //  error_log
+        //  error_log
         $resultado = Wsp::validarOTPPass($numero, $otp);
         Usuario::deleteOTPtemporal($id);
 
@@ -232,7 +300,7 @@ class WspController
         header('Content-Type: application/json');
         $ch = curl_init($url);
         $post = json_encode($postaux);
-        $authorization = "Authorization: Bearer EABVzZC4Gfh7YBOzQ2Mm6V6UzKzAVixZAQzL6cZAqj9Qo9bSZA6NooVQZA9vrDi1ipLmsqg9tXBfvJ7GdBvQCZCiaUkx9t9VHDGPYVxGif5eo2to346ZCq7RVddhxVZAjmkqlSlCqK9t4yZAk9ZBSekNHit1tjSsz7M7LqACPzqe6ZBo2ZA35k9HkN2o3sYBW7u4Q6FOZB32Ovxf11nwZArI0R3uyQMIDcfAVP9EV7ZA4ZBYZD";
+        $authorization = "Authorization: EABVzZC4Gfh7YBO9nzZA1aAXH2C7wpP8ATV5ZBZCxaSz8OxyWayZBZCdFOvCDE09yOgPFMyXMBg33cbuREyYZAc2DVPOnZA5ZBh4xpZC0kVhDHZBUFnAXZCxXEZBIOFgAbKRihSUU2xvVxNn5AZADCH2QVDden9k4hFfvNQfJnsO3CXjYPSnZAUHbJSOLvl1BC2toSd9mgmUzYFX0ZBo4k4PneUAp06TDykGASBasxIViJNQZD";
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, 1);

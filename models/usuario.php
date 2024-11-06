@@ -134,7 +134,7 @@ class Usuario
 
         return $query->fetch(PDO::FETCH_ASSOC); // Retorna el usuario si existe o false si no
     }
-//cambiar password
+    //cambiar password
     public static function cambiarpassword($telefono, $newPassword)
     {
         $db = getConnection();
@@ -160,6 +160,48 @@ class Usuario
             ];
         }
 
+    }
+
+    public static function deleteUser($idUser)
+    {
+        $db = getConnection();
+        $sql = "DELETE FROM users WHERE idUser = :idUser";
+        $stmt = $db->prepare($sql);
+        try {
+            $stmt->execute([
+                ":idUser" => $idUser
+            ]);
+
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            error_log("Error al elmiinar el usuario: " . $e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => "Error al elmiinar el usuario: " . $e->getMessage()
+            ];
+        }
+    }
+
+
+    public static function traerDatosbyEmail($email)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT telefono, name FROM pre_registro WHERE email = ?");
+        $stmt->execute([$email]);
+        $result = $stmt->fetch();
+
+        // Verificar si se encontró un resultado y devolver ambos valores
+        return $result ? ['telefono' => $result['telefono'], 'name' => $result['name']] : null;
+    }
+
+
+    public static function traerOTPbyTelefono($telefono)
+    {
+        $db = getConnection();
+        $stmt = $db->prepare("SELECT otp FROM tempotp WHERE numero = ?");
+        $stmt->execute([$telefono]);
+        $result = $stmt->fetch();
+        return $result ? $result['otp'] : null;
     }
 
     /*
